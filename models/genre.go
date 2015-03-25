@@ -53,3 +53,20 @@ func GetGenreByID(id int64) (*Genre, error) {
 
 	return genre, nil
 }
+
+func GetGenreByName(name string) (*Genre, error) {
+
+	db, err := sql.Open("mysql", beego.AppConfig.String("dbSource"))
+	checkErr(err)
+	defer db.Close()
+
+	out, err := db.Prepare("SELECT id, name, bg FROM genres WHERE name=?")
+	checkErr(err)
+	defer out.Close()
+
+	genre := new(Genre)
+	err = out.QueryRow(name).Scan(&genre.Id, &genre.Name, &genre.Bg)
+	checkErr(err)
+
+	return genre, nil
+}
